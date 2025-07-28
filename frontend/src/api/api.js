@@ -27,18 +27,34 @@ api.interceptors.response.use(
             // Greška sa servera (status kod postoji)
             if (response.status === 401) {
                 // Unauthorized - loš token ili je istekao
-                toast.error("Sesija je istekla. Molimo prijavite se ponovo.");
+                if (response.data?.message) {
+                    toast.error(response.data.message);
+                } else {
+                    toast.error("Niste prijavljeni ili je vaš token istekao.");
+                }
                 localStorage.removeItem('jwt_token');
                 // Reload stranice će automatski prebaciti na login
-                window.location.href = '/login';
+                if (window.location.pathname !== '/login') {
+                    window.location.href = '/login';
+                }
             } else if (response.status === 403) {
                 // Forbidden - nemaš dozvolu
                 toast.error("Pristup odbijen. Nemate potrebne dozvole.");
+                window.location.href = '/'; // Preusmeri na početnu
             } else if (response.status >= 400 && response.status < 500) {
                 // Ostale klijentske greške (npr. 404, 400)
-                // Prikazujemo poruku sa našeg backenda (iz ErrorResponse DTO)
-                const errorMessage = response.data?.message || 'Došlo je do greške.';
-                toast.error(errorMessage);
+                if (response.data?.errors && Array.isArray(response.data.errors)) {
+                    // Ako postoji lista grešaka, prikaži svaku pojedinačno
+                    response.data.errors.forEach((err) => {
+                        if (err.msg) {
+                            toast.error(err.msg);
+                        }
+                    });
+                } else {
+                    // Prikazujemo poruku sa našeg backenda (iz ErrorResponse DTO)
+                    const errorMessage = response.data?.message || 'Došlo je do greške.';
+                    toast.error(errorMessage);
+                }
             } else {
                 // Serverska greška (5xx)
                 toast.error("Došlo je do greške na serveru. Molimo pokušajte kasnije.");

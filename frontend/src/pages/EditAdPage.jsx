@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { getAdById, updateAd } from '../services/adService';
+import { useAuth } from '../hooks/useAuth';
 import { uploadFiles } from '../services/fileService';
 import { getAllCategories } from '../services/categoryService';
 import Spinner from '../components/Spinner';
@@ -12,6 +13,7 @@ const EditAdPage = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { register, handleSubmit, setValue, formState: { errors } } = useForm();
+    const { user } = useAuth();
     
     const [loading, setLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -26,6 +28,10 @@ const EditAdPage = () => {
         try {
             const [adRes, catRes] = await Promise.all([getAdById(id), getAllCategories()]);
             const ad = adRes.data;
+
+            if (ad.korisnikUsername !== user.username && user.role !== 'ROLE_ADMIN') {
+                throw new Error("Nemate dozvolu za izmenu ovog oglasa.");
+            }
             
             // Popuni formu
             setValue('naslov', ad.naslov);
@@ -86,7 +92,7 @@ const EditAdPage = () => {
             const adData = {
                 ...data,
                 cena: parseFloat(data.cena),
-                kategorijaId: parseInt(data.kategorijaId),
+                kategorijaId: data.kategorijaId,
                 slikeUrl: finalImageUrls,
             };
             

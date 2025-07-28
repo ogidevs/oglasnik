@@ -9,6 +9,7 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [token, setToken] = useState(localStorage.getItem('jwt_token'));
     const [isLoading, setIsLoading] = useState(true);
+    const [isAuthed, setIsAuthed] = useState(false);
 
     useEffect(() => {
         if (token) {
@@ -19,17 +20,21 @@ export const AuthProvider = ({ children }) => {
                     // Dohvati detaljne info o korisniku sa /me endpointa
                     api.get('/users/me').then(response => {
                         setUser(response.data);
-                    }).catch(() => { // Ako /me pukne, token je verovatno nevažeći
+                        setIsAuthed(true);
+                        setIsLoading(false);
+                    }).catch(() => {
                         logout();
                     });
                 } else {
                     logout(); // Token je istekao
                 }
             } catch (error) {
+                console.error("Token decode error:", error);
                 logout(); // Token je neispravan
             }
+        } else {
+            setIsLoading(false);
         }
-        setIsLoading(false);
     }, [token]);
 
     const login = async (credentials) => {
@@ -41,20 +46,21 @@ export const AuthProvider = ({ children }) => {
     };
 
     const register = async (userData) => {
-        await registerService(userData);
+        return await registerService(userData);
     };
 
     const logout = () => {
         localStorage.removeItem('jwt_token');
         setUser(null);
         setToken(null);
+        setIsAuthed(false);
     };
     
     const value = {
         user,
         token,
-        isAuthenticated: !!user,
         isLoading,
+        isAuthed,
         login,
         register,
         logout,

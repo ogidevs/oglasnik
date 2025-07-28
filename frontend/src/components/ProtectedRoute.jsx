@@ -4,10 +4,10 @@ import { useAuth } from '../hooks/useAuth';
 import Spinner from './Spinner';
 
 const ProtectedRoute = ({ adminOnly = false }) => {
-    const { isAuthenticated, user, isLoading } = useAuth();
+    const { isAuthed, user, isLoading } = useAuth();
 
-    if (isLoading || !user) return <Spinner />;
-    if (!isAuthenticated) return <Navigate to="/login" replace />;
+    if (isLoading) return <Spinner />;
+    if (!isLoading && !isAuthed && !user) return <Navigate to="/login" replace />;
     if (adminOnly && user.role !== 'ROLE_ADMIN') return <Navigate to="/" replace />;
 
     return <Outlet />;

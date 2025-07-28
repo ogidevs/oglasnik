@@ -1,22 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import toast from 'react-hot-toast';
 
 const LoginPage = () => {
-    const { register: registerForm, handleSubmit: handleLoginSubmit, formState: { errors: loginErrors } } = useForm();
-    const { register: registerRegister, handleSubmit: handleRegisterSubmit, formState: { errors: registerErrors } } = useForm();
+    const { register: registerForm, handleSubmit: handleLoginSubmit, formState: { errors: loginErrors }, reset: resetLoginForm } = useForm();
+    const { register: registerRegister, handleSubmit: handleRegisterSubmit, formState: { errors: registerErrors }, reset: resetRegisterForm } = useForm();
     const { login, register } = useAuth();
     const navigate = useNavigate();
     const [isLoginView, setIsLoginView] = useState(true);
+
+    useEffect(() => {
+        // Reset form state when switching between login and register views
+        if (isLoginView) {
+            resetLoginForm();
+        } else {
+            resetRegisterForm();
+        }
+    }, [isLoginView, registerForm, registerRegister]);
 
     const onLogin = async (data) => {
         try {
             await toast.promise(login(data), {
                 loading: 'Prijavljivanje...',
                 success: 'Uspešno ste prijavljeni!',
-                error: (err) => err.response?.data?.message || 'Greška pri prijavi.'
             });
             navigate('/');
         } catch (error) {}
@@ -24,13 +32,18 @@ const LoginPage = () => {
 
     const onRegister = async (data) => {
         try {
-            await toast.promise(register(data), {
+            const response = await toast.promise(register(data), {
                 loading: 'Registrovanje...',
                 success: 'Uspešno ste registrovani! Molimo prijavite se.',
-                error: (err) => err.response?.data?.message || 'Greška pri registraciji.'
             });
-            setIsLoginView(true); // Prebaci na login formu
-        } catch (error) {}
+            if (response?.status === 201 || response?.status === 200) {
+                await login({ username: data.username, password: data.password });
+                navigate('/');
+            }
+        } catch (error) {
+            console.error("Registration error:", error);
+            toast.error("Greška pri registraciji. Molimo pokušajte ponovo.");
+        }
     };
 
     return (

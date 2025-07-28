@@ -2,14 +2,16 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/Navbar';
-import HomePage from './pages/HomePage';
-import LoginPage from './pages/LoginPage';
-import AdDetailsPage from './pages/AdDetailsPage';
-import CreateAdPage from './pages/CreateAdPage';
-import EditAdPage from './pages/EditAdPage';
-import MyAdsPage from './pages/MyAdsPage';
-import AdminDashboard from './pages/admin/AdminDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
+import React, { lazy, Suspense } from 'react';
+
+const HomePage = lazy(() => import('./pages/HomePage'));
+const LoginPage = lazy(() => import('./pages/LoginPage'));
+const AdDetailsPage = lazy(() => import('./pages/AdDetailsPage'));
+const CreateAdPage = lazy(() => import('./pages/CreateAdPage'));
+const EditAdPage = lazy(() => import('./pages/EditAdPage'));
+const MyAdsPage = lazy(() => import('./pages/MyAdsPage'));
+const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
 
 function App() {
     return (
@@ -18,24 +20,26 @@ function App() {
                 <Toaster position="top-right" reverseOrder={false} />
                 <Navbar />
                 <main className="container mx-auto p-4">
-                    <Routes>
-                        {/* Javne rute */}
-                        <Route path="/" element={<HomePage />} />
-                        <Route path="/login" element={<LoginPage />} />
-                        <Route path="/ads/:id" element={<AdDetailsPage />} />
+                    <Suspense fallback={<div>Loading...</div>}>
+                        <Routes>
+                            {/* Javne rute */}
+                            <Route path="/" element={<HomePage />} />
+                            <Route path="/login" element={<LoginPage />} />
+                            <Route path="/ads/:id" element={<AdDetailsPage />} />
 
-                        {/* Zaštićene rute (za sve ulogovane) */}
-                        <Route element={<ProtectedRoute />}>
-                            <Route path="/ads/new" element={<CreateAdPage />} />
-                            <Route path="/ads/edit/:id" element={<EditAdPage />} />
-                            <Route path="/my-ads" element={<MyAdsPage />} />
-                        </Route>
-                        
-                        {/* Admin rute */}
-                        <Route element={<ProtectedRoute adminOnly />}>
-                            <Route path="/admin" element={<AdminDashboard />} />
-                        </Route>
-                    </Routes>
+                            {/* Zaštićene rute (za sve ulogovane) */}
+                            <Route element={<ProtectedRoute />}>
+                                <Route path="/ads/new" element={<CreateAdPage />} />
+                                <Route path="/ads/edit/:id" element={<EditAdPage />} />
+                                <Route path="/my-ads" element={<MyAdsPage />} />
+                            </Route>
+                            
+                            {/* Admin rute */}
+                            <Route element={<ProtectedRoute adminOnly />}>
+                                <Route path="/admin" element={<AdminDashboard />} />
+                            </Route>
+                        </Routes>
+                    </Suspense>
                 </main>
             </Router>
         </AuthProvider>

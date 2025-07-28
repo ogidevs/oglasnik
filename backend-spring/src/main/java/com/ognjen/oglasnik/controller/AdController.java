@@ -59,8 +59,8 @@ public class AdController {
 
     // KORISNIČKA FUNKCIONALNOST: Brisanje sopstvenog oglasa
     @DeleteMapping("/{id}")
-    @LogUserAction("Deleted post")
     @PreAuthorize("hasRole('ADMIN') or @adService.isOwner(#id, principal.username)")
+    @LogUserAction("Deleted post")
     public ResponseEntity<Void> deleteAd(@PathVariable Long id) {
         try {
             adService.deleteAd(id);
@@ -73,7 +73,7 @@ public class AdController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or @adService.isOwner(#id, authentication.name)")
+    @PreAuthorize("hasRole('ADMIN') or @adService.isOwner(#id, principal.username)")
     @LogUserAction("Updated post")
     public ResponseEntity<AdDto> updateAd(@PathVariable Long id, @RequestBody AdRequest adRequest) {
         // Servisna metoda `updateAd` ne mora da se menja, jer ne radi proveru vlasništva

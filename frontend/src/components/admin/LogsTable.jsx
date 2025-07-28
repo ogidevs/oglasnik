@@ -38,60 +38,62 @@ export default function LogsTable() {
   };
 
 return (
-    <div className="max-w-full mx-auto p-4">
+    <div className="max-w-full w-full mx-auto p-4">
         <h2 className="text-2xl font-semibold mb-4">Logovi Korisnika</h2>
 
         {loading ? (
             <div className="text-center py-10">Učitavanje...</div>
         ) : (
             <>
-                <table className="min-w-full bg-white border border-gray-200 rounded-md shadow-sm">
-                    <thead className="bg-gray-100">
-                        <tr>
-                            <th className="text-left px-4 py-2 border-b">Korisničko ime</th>
-                            <th className="text-left px-4 py-2 border-b">Akcija</th>
-                            <th className="text-left px-4 py-2 border-b">Metod</th>
-                            <th className="text-left px-4 py-2 border-b">Vreme</th>
-                            <th className="text-left px-4 py-2 border-b">IP Adresa</th>
-                            <th className="text-left px-4 py-2 border-b">Korisnički Agent</th>
-                            <th className="text-left px-4 py-2 border-b">Detalji</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {logs.length === 0 ? (
+                <div className="overflow-x-auto">
+                    <table className="min-w-full bg-white border border-gray-200 rounded-md shadow-sm">
+                        <thead className="bg-gray-100">
                             <tr>
-                                <td colSpan="6" className="text-center py-6 text-gray-500">
-                                    Nema pronađenih logova
-                                </td>
+                                <th className="text-left px-4 py-2 border-b">Korisničko ime</th>
+                                <th className="text-left px-4 py-2 border-b">Akcija</th>
+                                <th className="text-left px-4 py-2 border-b">Metod</th>
+                                <th className="text-left px-4 py-2 border-b">Vreme</th>
+                                <th className="text-left px-4 py-2 border-b">IP Adresa</th>
+                                <th className="text-left px-4 py-2 border-b">Korisnički Agent</th>
+                                <th className="text-left px-4 py-2 border-b">Detalji</th>
                             </tr>
-                        ) : (
-                            logs.map((log, idx) => (
-                                <tr
-                                    key={idx}
-                                    className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
-                                >
-                                    <td className="px-4 py-2 border-b">{log.username}</td>
-                                    <td className="px-4 py-2 border-b">{log.action}</td>
-                                    <td className="px-4 py-2 border-b">{log.method}</td>
-                                    <td className="px-4 py-2 border-b">
-                                        {new Date(log.timestamp).toLocaleString()}
+                        </thead>
+                        <tbody>
+                            {logs.length === 0 ? (
+                                <tr>
+                                    <td colSpan="7" className="text-center py-6 text-gray-500">
+                                        Nema pronađenih logova
                                     </td>
-                                    <td className="px-4 py-2 border-b">{log.ipAddress}</td>
-                                    <td className="px-4 py-2 border-b truncate max-w-xs" title={log.userAgent}>
-                                        {log.userAgent}
-                                    </td>
-                                    <td className="px-4 py-2 border-b">
-                                        {log.details ? (
-                                            <pre className="whitespace-pre-wrap break-words">{log.details}</pre>
-                                        ) : (
-                                            'N/A'
-                                        )}
-                                        </td>
                                 </tr>
-                            ))
-                        )}
-                    </tbody>
-                </table>
+                            ) : (
+                                logs.map((log, idx) => (
+                                    <tr
+                                        key={idx}
+                                        className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
+                                    >
+                                        <td className="px-4 py-2 border-b">{log.username}</td>
+                                        <td className="px-4 py-2 border-b">{log.action}</td>
+                                        <td className="px-4 py-2 border-b">{log.method}</td>
+                                        <td className="px-4 py-2 border-b">
+                                            {new Date(log.timestamp).toLocaleString()}
+                                        </td>
+                                        <td className="px-4 py-2 border-b">{log.ipAddress}</td>
+                                        <td className="px-4 py-2 border-b truncate max-w-xs" title={log.userAgent}>
+                                            {log.userAgent}
+                                        </td>
+                                        <td className="px-4 py-2 border-b">
+                                            {log.details ? (
+                                                <pre className="whitespace-pre-wrap break-words">{log.details}</pre>
+                                            ) : (
+                                                'N/A'
+                                            )}
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                </div>
 
                 {/* Kontrole za paginaciju */}
                 <div className="flex justify-between items-center mt-4">

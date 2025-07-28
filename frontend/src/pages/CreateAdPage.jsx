@@ -52,7 +52,7 @@ const CreateAdPage = () => {
             const adData = {
                 ...data,
                 cena: parseFloat(data.cena),
-                kategorijaId: parseInt(data.kategorijaId),
+                kategorijaId: data.kategorijaId,
                 slikeUrl: uploadedImageUrls,
             };
             
