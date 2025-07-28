@@ -5,6 +5,7 @@ import { useAuth } from '../hooks/useAuth';
 import Spinner from '../components/Spinner';
 import { FaUser, FaTag, FaCalendarAlt, FaEdit, FaTrash } from 'react-icons/fa';
 import toast from 'react-hot-toast';
+import ImageCarousel from '../components/ImageCarousel';
 
 const AdDetailsPage = () => {
     const { id } = useParams();
@@ -50,7 +51,7 @@ const AdDetailsPage = () => {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
-                    <img src={ad.slikeUrl?.[0] || 'https://placehold.co/600x400?text=Nema+Slike'} alt={ad.naslov} className="w-full h-auto rounded-lg shadow-md" />
+                    <ImageCarousel images={ad.slikeUrl} alt={ad.naslov} />
                 </div>
                 <div>
                     <p className="text-3xl font-bold text-indigo-600 mb-6">{ad.cena} €</p>
