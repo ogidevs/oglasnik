@@ -1,18 +1,19 @@
 package com.ognjen.oglasnik.controller;
 
+import com.ognjen.oglasnik.dto.LogDto;
 import com.ognjen.oglasnik.dto.UserDto;
 import com.ognjen.oglasnik.dto.UserUpdateDto;
 import com.ognjen.oglasnik.model.Category;
 import com.ognjen.oglasnik.service.AdService;
 import com.ognjen.oglasnik.service.CategoryService;
+import com.ognjen.oglasnik.service.LogService;
 import com.ognjen.oglasnik.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -24,11 +25,14 @@ public class AdminController {
     private final UserService userService;
     private final AdService adService;
     private final CategoryService categoryService;
+    private final LogService logService;
 
     // --- Upravljanje korisnicima ---
     @GetMapping("/users")
-    public List<UserDto> getAllUsers() {
-        return userService.findAllUsers();
+    public Page<UserDto> getUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return userService.findAllUsers(page, size);
     }
 
     @DeleteMapping("/users/{id}")
@@ -62,5 +66,17 @@ public class AdminController {
     public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
         categoryService.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/logs")
+    public Page<LogDto> getLogs(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String username
+    ) {
+        if (username != null && !username.isBlank()) {
+            return logService.getLogsByUsername(username, page, size);
+        }
+        return logService.getLogs(page, size);
     }
 }

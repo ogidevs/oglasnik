@@ -9,12 +9,13 @@ import com.ognjen.oglasnik.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,16 +25,16 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     // service/UserService.java
-    public List<UserDto> findAllUsers() {
-        return userRepository.findAll()
-                .stream()
-                .map(user -> UserDto.builder()
-                        .id(user.getId())
-                        .username(user.getUsername())
-                        .email(user.getEmail())
-                        .role(user.getRole())
-                        .build())
-                .collect(Collectors.toList());
+    public Page<UserDto> findAllUsers(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("username").ascending());
+        Page<User> userPage = userRepository.findAll(pageable);
+
+        return userPage.map(user -> UserDto.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .role(user.getRole())
+                .build());
     }
 
     public void registerUser(RegisterRequest request) {

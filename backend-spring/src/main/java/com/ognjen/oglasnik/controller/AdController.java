@@ -1,5 +1,6 @@
 package com.ognjen.oglasnik.controller;
 
+import com.ognjen.oglasnik.annotation.LogUserAction;
 import com.ognjen.oglasnik.dto.AdDto;
 import com.ognjen.oglasnik.dto.AdRequest;
 import com.ognjen.oglasnik.service.AdService;
@@ -40,6 +41,7 @@ public class AdController {
 
     // JAVNA FUNKCIONALNOST: Detaljan pregled jednog oglasa
     @GetMapping("/{id}")
+    @LogUserAction("Details about post")
     public ResponseEntity<AdDto> getAdById(@PathVariable Long id) {
         return adService.findById(id)
                 .map(ResponseEntity::ok)
@@ -49,6 +51,7 @@ public class AdController {
     // KORISNIČKA FUNKCIONALNOST: Kreiranje oglasa (potrebna autentifikacija)
     @PostMapping
     @PreAuthorize("isAuthenticated()")
+    @LogUserAction("Created post")
     public ResponseEntity<AdDto> createAd(@RequestBody AdRequest adRequest, @AuthenticationPrincipal UserDetails userDetails) {
         AdDto createdAd = adService.createAd(adRequest, userDetails.getUsername());
         return new ResponseEntity<>(createdAd, HttpStatus.CREATED);
@@ -56,6 +59,7 @@ public class AdController {
 
     // KORISNIČKA FUNKCIONALNOST: Brisanje sopstvenog oglasa
     @DeleteMapping("/{id}")
+    @LogUserAction("Deleted post")
     @PreAuthorize("hasRole('ADMIN') or @adService.isOwner(#id, principal.username)")
     public ResponseEntity<Void> deleteAd(@PathVariable Long id) {
         try {
@@ -70,6 +74,7 @@ public class AdController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or @adService.isOwner(#id, authentication.name)")
+    @LogUserAction("Updated post")
     public ResponseEntity<AdDto> updateAd(@PathVariable Long id, @RequestBody AdRequest adRequest) {
         // Servisna metoda `updateAd` ne mora da se menja, jer ne radi proveru vlasništva
         AdDto updatedAd = adService.updateAd(id, adRequest);

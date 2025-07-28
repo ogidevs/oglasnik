@@ -4,3 +4,4 @@ export const getAllUsers = () => api.get('/admin/users');
 export const deleteUser = (id) => api.delete(`/admin/users/${id}`);
 export const updateUser = (id, userData) => api.put(`/admin/users/${id}`, userData);
 export const getUserInfo = () => api.get('/users/me');
+export const getLogs = (params) => api.get('/admin/logs', { params });

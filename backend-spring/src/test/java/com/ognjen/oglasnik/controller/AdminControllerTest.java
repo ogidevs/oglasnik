@@ -11,9 +11,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
@@ -54,13 +56,17 @@ public class AdminControllerTest {
     void getAllUsers_whenAdmin_shouldReturnUserList() throws Exception {
         // Arrange
         UserDto userDto = UserDto.builder().id(1L).username("testuser").role(Role.ROLE_USER).build();
-        given(userService.findAllUsers()).willReturn(List.of(userDto));
+        List<UserDto> userDtos = List.of(userDto);
+
+        Page<UserDto> userDtoPage = new PageImpl<>(userDtos);
+
+        given(userService.findAllUsers(0, 10)).willReturn(userDtoPage);
 
         // Act & Assert
         mockMvc.perform(get("/api/admin/users"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].username", is("testuser")));
+                .andExpect(jsonPath("$.content", hasSize(1)))
+                .andExpect(jsonPath("$.content[0].username", is("testuser")));
     }
 
     @Test
