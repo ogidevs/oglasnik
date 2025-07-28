@@ -81,11 +81,6 @@ const EditAdPage = () => {
             
             // 2. Spoji postojeće i nove URL-ove
             const finalImageUrls = [...existingImageUrls, ...newUploadedUrls];
-            if (finalImageUrls.length === 0) {
-                toast.error("Oglas mora imati bar jednu sliku.");
-                setIsSubmitting(false);
-                return;
-            }
 
             // 3. Ažuriraj oglas
             const adData = {
