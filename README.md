@@ -101,7 +101,7 @@ The project consists of two parts: the backend server and the frontend client.
 1. Navigate to the frontend folder:
 
    ```bash
-   cd oglasnik-frontend/
+   cd frontend/
    ```
 2. Install all necessary dependencies:
 
